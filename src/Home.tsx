@@ -13,7 +13,9 @@ const Home: React.FC = () => {
   // Start the camera stream
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }  // 外カメラ（リアカメラ）を選択
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
