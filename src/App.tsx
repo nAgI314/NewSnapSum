@@ -1,19 +1,12 @@
-import { Routes, Route } from "react-router-dom";
-import Home from "./Home.tsx";
+import React, { Suspense } from 'react';
 
-import './App.css'
+const Home = React.lazy(() => import('./Home'));
 
+const App = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Home />
+  </Suspense>
+);
 
-function App() {
-
-
-  return (
-    <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </>
-  )
-}
 
 export default App

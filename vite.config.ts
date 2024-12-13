@@ -6,6 +6,7 @@ import { resolve } from "path";
 // https://vite.dev/config/
 export default defineConfig({
     base: '/NewSnapSum/',
+    
     plugins: [react(), env({ prefix: "VITE", mountedPath: "process.env" })],
     build: {
         rollupOptions: {
