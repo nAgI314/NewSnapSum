@@ -7,7 +7,7 @@ type GenerativePart = {
     };
 };
 
-export async function Gemini(file: File, prompt:string): Promise<void> {
+export async function Gemini(file: File, prompt:string): Promise<string> {
     // Google Generative AI インスタンスの初期化
     const apiKey = process.env.VITE_API_KEY!; // 環境変数の読み込み
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -41,7 +41,9 @@ export async function Gemini(file: File, prompt:string): Promise<void> {
         const imagePart = await fileToGenerativePart(file);
         const result = await model.generateContent([prompt, imagePart]);
         console.log(await result.response.text());
+        return(result.response.text());
     } catch (err) {
         console.error("Error generating content:", err);
+        return("");
     }
 }

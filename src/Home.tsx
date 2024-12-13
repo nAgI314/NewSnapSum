@@ -1,14 +1,19 @@
 import React from "react";
 
-import  { useRef} from 'react';
+import  {useState, useRef} from 'react';
+import './Home.css'
 import './App.css'
 import { Gemini } from './gemini'
+import ResCal from "./responseCalculate"
 
 const Home: React.FC = () => {
-    const prompt ="Please tell me all the numbers you see in the picture.You do not need to say anything other than the numbers.Pay attention to the decimal points." 
+  const prompt ="Please tell me all the numbers you see in the picture.You do not need to say anything other than the numbers.Pay attention to the decimal points." 
+
+  const [result, setResult] = useState<string>('');
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
 
   // Start the camera stream
   const startCamera = async () => {
@@ -26,7 +31,7 @@ const Home: React.FC = () => {
   };
 
   // Capture the photo
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current!;
@@ -40,7 +45,8 @@ const Home: React.FC = () => {
 
         const photoData = canvas.toDataURL('image/png');
         const file = dataURLtoFile(photoData, `photo-${Date.now()}.png`)
-        Gemini(file,prompt);
+        const resultFromGemin = await Gemini(file,prompt);
+        setResult(resultFromGemin);
       }
     }
   };
@@ -67,6 +73,8 @@ const Home: React.FC = () => {
   </div>
   <button onClick={startCamera}>Start Camera</button>
   <button onClick={capturePhoto}>Capture Photo</button>
+  {result && <p>{result}</p>}
+  <ResCal/>
   </>);
 };
 
