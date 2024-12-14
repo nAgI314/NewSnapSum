@@ -40,8 +40,9 @@ export async function Gemini(file: File, prompt:string): Promise<string> {
     try {
         const imagePart = await fileToGenerativePart(file);
         const result = await model.generateContent([prompt, imagePart]);
-        console.log(await result.response.text());
-        return(result.response.text());
+        const responseText = await result.response.text();
+        console.log("Response Text:", responseText);
+        return responseText;
     } catch (err) {
         console.error("Error generating content:", err);
         return("");

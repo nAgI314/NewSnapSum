@@ -1,12 +1,13 @@
 import React from 'react';
 
-const resCal: React.FC = () => {
+const ResCal: React.FC<{ response: string }> = ({ response }) => {
+  
 
     return(
     <>
-    <h1>こんにちは</h1>
+    <h1>{response}</h1>
     </>
   );
 }
 
-export default resCal;
+export default ResCal;

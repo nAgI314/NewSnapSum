@@ -7,8 +7,9 @@ import { Gemini } from './gemini'
 import ResCal from "./responseCalculate"
 
 const Home: React.FC = () => {
-  const prompt ="Please tell me all the numbers you see in the picture.You do not need to say anything other than the numbers.Pay attention to the decimal points." 
+  const prompt ="Please extract the numbers visible in the image. Separate each number with a single space. If a number includes a decimal point, ensure it is recognized as a decimal and handled accurately. Do not address or mention anything other than the numbers." 
 
+  const [photoData, setPhotoData] = useState<string | null>(null); // 撮影した写真のデータURL
   const [result, setResult] = useState<string>('');
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -24,6 +25,7 @@ const Home: React.FC = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
+        setPhotoData(null); // 撮影した写真をクリアしてビデオに戻す
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -44,6 +46,12 @@ const Home: React.FC = () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const photoData = canvas.toDataURL('image/png');
+        setPhotoData(photoData);
+
+        // ビデオストリームを停止
+        const stream = video.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+
         const file = dataURLtoFile(photoData, `photo-${Date.now()}.png`)
         const resultFromGemin = await Gemini(file,prompt);
         setResult(resultFromGemin);
@@ -64,17 +72,26 @@ const Home: React.FC = () => {
     return new File([u8arr], filename, { type: mime });
   };
   
+  const reloadPage = () => {
+    window.location.reload();
+  };
+
+  startCamera();
   return (
   <>
   <h1>SnapSum</h1>
   <div>
-    <video ref={videoRef} style={{ width: '100%', maxWidth: '500px' }} />
+     {photoData ? (
+          <img src={photoData} alt="Captured" style={{ width: '100%', maxWidth: '500px' }} />
+        ) : (
+          <video ref={videoRef} style={{ width: '100%', maxWidth: '500px' }} />
+        )}
     <canvas ref={canvasRef} style={{ display: 'none' }} />
   </div>
-  <button onClick={startCamera}>Start Camera</button>
-  <button onClick={capturePhoto}>Capture Photo</button>
+  <button onClick={reloadPage}>Start</button>
+  <button onClick={capturePhoto}>Capture</button>
   {result && <p>{result}</p>}
-  <ResCal/>
+  <ResCal response={result}/>
   </>);
 };
 
