@@ -36,13 +36,20 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
   );
 
   const [data, setData] = useState<InputData[]>([]);
+  const [multipliers, setMultipliers] = useState<{ [id: number]: number }>({}); // 各倍率
   const [totalSum, setTotalSum] = useState(0); // 合計値を管理するstate
-
+  
+  
   // responseの変更時にデータを更新
   useEffect(() => {
     const parsedData = parseStringToObjectArray(response);
     setData(parsedData);
-    calculateTotal(parsedData); // 初期合計値の計算
+    const initialMultipliers: { [id: number]: number } = {};
+    parsedData.forEach((item) => {
+      initialMultipliers[item.id] = 1;
+    });
+    setMultipliers(initialMultipliers);
+    calculateTotal(parsedData,initialMultipliers); // 初期合計値の計算
   }, [response]);
 
   // 画像がロードされた時にサイズを取得
@@ -60,11 +67,21 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
       item.id === id ? { ...item, number: newValue } : item
     );
     setData(updatedData);
-    calculateTotal(updatedData); // 入力が変更されたら合計を再計算
+    calculateTotal(updatedData, multipliers);// 入力が変更されたら合計を再計算
+  };
+  
+  // 倍率入力変更時の処理
+  const handleMultiplierChange = (id: number, newMultiplier: number) => {
+    const updatedMultipliers = { ...multipliers, [id]: newMultiplier };
+    setMultipliers(updatedMultipliers);
+    calculateTotal(data, updatedMultipliers);
   };
 
-  const calculateTotal = (data: InputData[]) => {
-    const sum = data.reduce((acc, curr) => acc + (curr.number || 0), 0);
+  const calculateTotal = (data: InputData[], multipliers: { [id: number]: number }) => {
+    const sum = data.reduce(
+      (acc, curr) => acc + (curr.number || 0) * (multipliers[curr.id] || 1),
+      0
+    );
     const roundedTotal = Math.round(sum * 10000) / 10000;
     setTotalSum(roundedTotal);
   };
@@ -91,32 +108,50 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
         
       />
 
-      {/* 座標に基づく入力フィールドの配置 */}
+      {/* 座標に基づく入力フィールドと倍率フィールドの配置 */}
       {imageSize.width > 0 &&
         data.map(({ id, number, x, y }) => {
-          // ピクセル座標に変換
-          const pixelX = (x + 0.1) * imageSize.width ;
-          const pixelY = y * imageSize.height ;
+          const pixelX = (x + 0.1) * imageSize.width;
+          const pixelY = y * imageSize.height;
 
           return (
-            <input
+            <div
               key={id}
-              type="number"
-              value={number}
-              onChange={(e) => handleInputChange(id, Number(e.target.value))}
               style={{
                 position: "absolute",
                 left: `${pixelX}px`,
                 top: `${pixelY}px`,
-                transform: "translate(-50%, -50%)", // 中央揃え
-                width: "50px",
-                height: "25px",
-                textAlign: "center",
-                fontSize: "14px",
-                border: "1px solid black",
-                background: "white",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
               }}
-            />
+            >
+              {/* 倍率入力フィールド */}
+              <input
+                type="number"
+                step="1"
+                value={multipliers[id] || 1}
+                onChange={(e) =>
+                  handleMultiplierChange(id, parseFloat(e.target.value) || 1)
+                }
+                style={{
+                  width: "20px",
+                  textAlign: "center",
+                }}
+              />
+
+              {/* 数値入力フィールド */}
+              <input
+                type="number"
+                value={number}
+                onChange={(e) => handleInputChange(id, Number(e.target.value))}
+                style={{
+                  width: "50px",
+                  textAlign: "center",
+                }}
+              />
+            </div>
           );
         })}
         {/* 合計値の表示 */}
