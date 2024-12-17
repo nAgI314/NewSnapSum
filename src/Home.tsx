@@ -5,9 +5,10 @@ import './Home.css'
 import './App.css'
 import { Gemini } from './gemini'
 import ResCal from "./responseCalculate"
+import PutNumber from "./putNumber";
 
 const Home: React.FC = () => {
-  const prompt ="Please extract the numbers visible in the image. Separate each number with a single space. If a number includes a decimal point, ensure it is recognized as a decimal and handled accurately. Do not address or mention anything other than the numbers." 
+  const prompt = "Please extract the numbers visible in the image. For each number, provide the coordinates relative to the image, assuming the top-left corner has coordinates x=0, y=0, and the bottom-right corner has coordinates x=1, y=1. Output the results in the following format: {number: <extracted number>, x: <x-coordinate>, y: <y-coordinate>}. Ensure that each entry is on a new line and is formatted exactly as described. If a number includes a decimal point, ensure it is recognized as a decimal and handled accurately. Do not address or mention anything other than the specified output format.";
 
   const [photoData, setPhotoData] = useState<string | null>(null); // 撮影した写真のデータURL
   const [result, setResult] = useState<string>('');
@@ -82,8 +83,11 @@ const Home: React.FC = () => {
   <h1>SnapSum</h1>
   <div>
      {photoData ? (
-          <img src={photoData} alt="Captured" style={{ width: '100%', maxWidth: '500px' }} />
-        ) : (
+          <div>
+          <PutNumber image={photoData} response={result} />
+          {/* <img src={photoData} alt="Captured" style={{ width: '100%', maxWidth: '500px' }} /> */}
+          </div>
+          ) : (
           <video ref={videoRef} style={{ width: '100%', maxWidth: '500px' }} />
         )}
     <canvas ref={canvasRef} style={{ display: 'none' }} />
