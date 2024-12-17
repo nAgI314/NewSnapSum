@@ -36,10 +36,13 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
   );
 
   const [data, setData] = useState<InputData[]>([]);
+  const [totalSum, setTotalSum] = useState(0); // 合計値を管理するstate
 
   // responseの変更時にデータを更新
   useEffect(() => {
-    setData(parseStringToObjectArray(response));
+    const parsedData = parseStringToObjectArray(response);
+    setData(parsedData);
+    calculateTotal(parsedData); // 初期合計値の計算
   }, [response]);
 
   // 画像がロードされた時にサイズを取得
@@ -53,11 +56,17 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
 
   // 入力変更時の処理
   const handleInputChange = (id: number, newValue: number) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, number: newValue } : item
-      )
+    const updatedData = data.map((item) =>
+      item.id === id ? { ...item, number: newValue } : item
     );
+    setData(updatedData);
+    calculateTotal(updatedData); // 入力が変更されたら合計を再計算
+  };
+
+  const calculateTotal = (data: InputData[]) => {
+    const sum = data.reduce((acc, curr) => acc + (curr.number || 0), 0);
+    const roundedTotal = Math.round(sum * 10000) / 10000;
+    setTotalSum(roundedTotal);
   };
 
   return (
@@ -92,7 +101,7 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
           return (
             <input
               key={id}
-              type="text"
+              type="number"
               value={number}
               onChange={(e) => handleInputChange(id, Number(e.target.value))}
               style={{
@@ -110,6 +119,22 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
             />
           );
         })}
+        {/* 合計値の表示 */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "10px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          padding: "10px 20px",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          color: "#fff",
+          fontSize: "18px",
+          borderRadius: "5px",
+        }}
+      >
+        合計: {totalSum}
+      </div>
     </div>
   );
 };
