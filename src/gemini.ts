@@ -9,7 +9,8 @@ type GenerativePart = {
 
 export async function Gemini(file: File, prompt:string): Promise<string> {
     // Google Generative AI インスタンスの初期化
-    const apiKey = process.env.VITE_API_KEY!; // 環境変数の読み込み
+    const apiKey = import.meta.env.VITE_API_KEY!; // 環境変数の読み込み
+    //console.log(import.meta.env.VITE_API_KEY);
     const genAI = new GoogleGenerativeAI(apiKey);
     const model: GenerativeModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const mimeType = file.type; 
