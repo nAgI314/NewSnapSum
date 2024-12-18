@@ -92,8 +92,8 @@ const Home: React.FC = () => {
         )}
     <canvas ref={canvasRef} style={{ display: 'none' }} />
   </div>
-  <button onClick={reloadPage}>Start</button>
-  <button onClick={capturePhoto}>Capture</button>
+  <button onClick={capturePhoto}>撮る</button>
+  <button onClick={reloadPage}>リセット</button>
   {result && <p>{result}</p>}
   <ResCal response={result}/>
   </>);

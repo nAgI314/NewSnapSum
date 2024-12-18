@@ -80,7 +80,7 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
 
   const calculateTotal = (data: InputData[], multipliers: { [id: number]: number }) => {
     const sum = data.reduce(
-      (acc, curr) => acc + (curr.number || 0) * (multipliers[curr.id] ),
+      (acc, curr) => acc + (curr.number || 0) * (multipliers[curr.id] || 0),
       0
     );
     const roundedTotal = Math.round(sum * 10000) / 10000;
