@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import './putNumber.css'
 
 interface InputData {
   id: number;
@@ -79,7 +80,7 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
 
   const calculateTotal = (data: InputData[], multipliers: { [id: number]: number }) => {
     const sum = data.reduce(
-      (acc, curr) => acc + (curr.number || 0) * (multipliers[curr.id] || 1),
+      (acc, curr) => acc + (curr.number || 0) * (multipliers[curr.id] ),
       0
     );
     const roundedTotal = Math.round(sum * 10000) / 10000;
@@ -131,10 +132,18 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
               <input
                 type="number"
                 step="1"
-                value={multipliers[id] || 1}
-                onChange={(e) =>
-                  handleMultiplierChange(id, parseFloat(e.target.value) || 1)
-                }
+                value={multipliers[id]}
+                onChange={(e) =>{
+                  if(e.target.value != null ){
+                    handleMultiplierChange(id, parseFloat(e.target.value))
+                  }
+                }}
+                onBlur={(e)=>{
+                  console.log(e)
+                  if(e.target.value == "" ){
+                    handleMultiplierChange(id, 0)
+                  }
+                }}
                 style={{
                   width: "20px",
                   textAlign: "center",
@@ -149,6 +158,7 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
                 style={{
                   width: "50px",
                   textAlign: "center",
+                  
                 }}
               />
             </div>
