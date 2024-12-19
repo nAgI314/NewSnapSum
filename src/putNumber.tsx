@@ -87,6 +87,7 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
     setTotalSum(roundedTotal);
   };
 
+  
   return (
     <div
       ref={photoContainerRef}
@@ -132,16 +133,11 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
               <input
                 type="number"
                 step="1"
+                //value={multipliers[id]== 0 ? "" : multipliers[id]}
                 value={multipliers[id]}
                 onChange={(e) =>{
                   if(e.target.value != null ){
                     handleMultiplierChange(id, parseFloat(e.target.value))
-                  }
-                }}
-                onBlur={(e)=>{
-                  console.log(e)
-                  if(e.target.value == "" ){
-                    handleMultiplierChange(id, 0)
                   }
                 }}
                 style={{
@@ -153,8 +149,14 @@ const PutNumber: React.FC<{ image: string; response: string }> = ({
               {/* 数値入力フィールド */}
               <input
                 type="number"
-                value={number}
-                onChange={(e) => handleInputChange(id, Number(e.target.value))}
+                value={number == 0 ? "" : number}
+                onChange={(e) => {
+                  if(e.target.value != null ){
+                    handleInputChange(id, Number(e.target.value))
+                  }else{
+
+                  }
+                }}
                 style={{
                   width: "50px",
                   textAlign: "center",
